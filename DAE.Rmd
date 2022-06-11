@@ -71,7 +71,7 @@ matplot(out[,1], out[,2:3], type = "l", lwd = 2,
 
 ```
    
-### **DAEs con indice <=3**   
+### **DAEs con índice hasta 3**   
 Para esto usaremos la función **radau**.   
 Consideramos el problema del péndulo:    
 
