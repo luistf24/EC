@@ -1,1 +1,2 @@
 # EC
+- Práctica Estadística Computacional

@@ -1,0 +1,120 @@
+---
+title: "Ecuaciones diferenciales algebraicas"
+author: "Grupo tal"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+ 
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width=8, fig.height=8
+)
+```
+
+```{r, fig.show='hold'}
+library(deSolve)
+```
+
+## Ecuaciones diferenciales algebraicas
+
+Un sistema de ecuaciones diferenciales algebraicas es un sistema de ecuaciones que consiste en una ecuación diferencial ordinaria(EDO) además de una ecuación algebraica, ambas ecuaciones deben ser satisfechas simultáneamente.   
+
+El paquete **deSolve** contine dos funciones que resuelven el problema de valor inicial de ecuaciones diferenciales algebraicas:   
+
+-   **radau** que implementa el algoritmo de Runge-Kutta RADAU5   
+-   **daspk** basado en DASPK    
+
+La función **radau** necesita una entrada de la forma: $My'=f(t,y,y')$ donde $M$ es la matriz masa.   
+
+La función **daspk** puede recibir la misma entrada, pero también puede resolver un problema escrito de la forma $F(t,y,y')=0$   
+
+
+### **DAEs con indice maximal 1**    
+
+La función **daspk** del paquete deSolve resuelve (de manera relativamente simple) DAEs con indice maximal 1.    
+Consideramos el siguiente DAE:   
+
+\begin{gather*} 
+\frac{dy_1}{dt}=y_2\\
+t = y_1
+\end{gather*}
+
+donde la primera ecuación es una ecuación diferencial y la segunda es una ecuación algebraica.   
+Para resolverlo:
+
+```{r, fig.show='hold'}
+
+daefun <- function(t, y, dy, parameters) 
+{
+  res1 <- dy[1] - y[2]
+  res2 <- -y[1] + t
+  list(c(res1, res2))
+}
+
+yini  <- c(0, 1)
+dyini <- c(1, 0)
+times <- seq(0, 10, 0.1)
+
+system.time(out <- daspk(y = yini, dy = dyini,
+            times = times, res = daefun, parms = 0))
+  
+matplot(out[,1], out[,2:3], type = "l", lwd = 2,
+ main = "dae", xlab = "time", ylab = "y")
+
+```
+   
+### **DAEs con indice <=3**   
+Para esto usaremos la función **radau**.   
+Consideramos el problema del péndulo:    
+
+![](klk.jpg){width='300px'}   
+Con ecuación:
+\begin{align*}  
+x'& = u \\
+y'& = v \\
+u'& = -\lambda x \\
+v'& = -\lambda y - g \\ 
+0 & = x^2 + y^2 - L^2 
+\end{align*}   
+
+```{r, fig.show='hold'}
+
+#Definimos el DAE
+pendulo <- function (t, L, Y, parms) 
+{
+    with (as.list(Y),
+        list(c(u,
+               v,
+               -lam*x,
+               -lam*y-9.8,
+                x^2+y^2-L^2
+        ))
+    )
+}
+
+#Valores iniciales
+yini <- c(x = 1, y = 0, u = 0, v = 1, lam = 1)
+
+#Calculamos la matriz masa
+M <- diag(nrow = 5)
+M[5, 5] <- 0
+M
+```   
+```{r, fig.show='hold',fig_width=10,fig_height=10}
+# Calculamos la solución usando radau
+index <- c(2, 2, 1)
+times <- seq(from = 0, to = 10, by = 0.01)
+out <- radau (y = yini, func = pendulo, L=1, parms = NULL,
+              times = times, mass = M, nind = index)
+
+plot(out, type = "l", lwd = 2)
+plot(out[, c("x", "y")], type = "l", lwd = 2)
+```
