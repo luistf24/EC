@@ -103,6 +103,7 @@ Donde algunos de los parámetros más importantes son:
 - ***nalg:*** Si es un DAE: el numero de ecuaciones algebraicas   
 
 - ***rtol:*** Tolerancia del error relativo, puede se un escalar o un vector, uno por cada y    
+
 - ***atol:*** Tolerancia del error absoluto,  puede se un escalar o un vector, uno por cada y    
 
 - ***jacfunc:*** Si no es 'NULL', es una R function que computa el jacobiano del distema de ecuaciones diferenciales.   
@@ -132,10 +133,11 @@ y'& = v \\
 u'& = -\lambda x \\
 v'& = -\lambda y - g \\ 
 0 & = x^2 + y^2 - L^2 
-\end{align*}   
+\end{align*}  
+
+Para resolverlo:   
 
 ```{r, fig.show='hold'}
-
 #Definimos el DAE
 pendulo <- function (t, L, Y, parms) 
 {
@@ -168,7 +170,7 @@ plot(out, type = "l", lwd = 2)
 plot(out[, c("x", "y")], type = "l", lwd = 2)
 ```
 
-Los parámetros de la función daspk son:   
+Los parámetros de la función radau son:   
 ```
 radau(y, times, func, parms, nind = c(length(y), 0, 0), 
   rtol = 1e-6, atol = 1e-6, jacfunc = NULL, jactype = "fullint", 
@@ -193,6 +195,7 @@ Donde algunos de los parámetros más importantes son:
 - ***nind:*** Si el sistema DAE: es un vector 3-valuado con el número de variables con índice 1, 2, 3 respectivamente, la ecuación tiene que ser definida variables de índice 1, precedidas de las variables de índice 2, precedidas de las variables de índice 3. La suma de los índices tiene que ser igual a N.   
 
 - ***rtol:*** Tolerancia del error relativo, puede se un escalar o un vector, uno por cada y    
+
 - ***atol:*** Tolerancia del error absoluto,  puede se un escalar o un vector, uno por cada y    
 
 - ***jacfunc:*** Si no es 'NULL', es una R function que computa el jacobiano del distema de ecuaciones diferenciales.   
